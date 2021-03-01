@@ -4,22 +4,24 @@ import "./style.css";
 
 class ItemAddForm extends Component {
   state = {
-    item: "",
+    label: "",
   };
 
-  onClickAdd=()=>{
-    const input = document.querySelector('#input')
-    // console.log(input.value);
-    this.props.addItem(input.value)
-    input.value="";
+  onLabelChange = (e) => {
+    this.setState({ label: e.target.value })
   }
 
+  onSubmit = (e) => {
+    e.preventDefault()
+    this.props.addItem(this.state.label);
+    this.setState({ label:''})
+  }
   render() {
     return (
-      <div className = "item-add-form">
-        <input id='input' type="text" placeholder="Add tasks" />
-        <button onClick = {this.onClickAdd} className = "btn btn-outline-secondary">Add</button>
-      </div>
+      <form className = "item-add-form d-flex" onSubmit = {this.onSubmit}>
+        <input className = "form-control" type="text" placeholder="What needs to be done" onChange = {this.onLabelChange} value={this.state.label} />
+        <button className = "btn btn-outline-secondary">Add</button>
+      </form>
     );
   }
 }
