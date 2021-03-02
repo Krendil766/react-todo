@@ -19,45 +19,48 @@ class App extends Component {
       { label: "Learn Redux", important: false, id: 6, done: false },
       { label: "Learn Hooks", important: false, id: 7, done: false },
     ],
-    term: '',
+    term: "",
+    filter: "all",
   };
   togglePropperty = (arr, id, propName) => {
     // const idx = arr.findIndex(item => item.id === id);
     // const oldItem = arr[idx];
     // const newItem = { ...oldItem, [propName]: !oldItem[propName] }
     // return [...arr.slice(0, idx), newItem, ...arr.slice(idx + 1)];
-    return arr.map(item => {
+    return arr.map((item) => {
       if (item.id === id) {
-        return { ...item, [propName]: !item[propName] }
+        return { ...item, [propName]: !item[propName] };
       }
       return item;
-    })
-  }
+    });
+  };
   onToggleDone = (id) => {
     this.setState(({ todoData }) => {
       return {
-        todoData: this.togglePropperty(todoData, id, 'done')
-      }
-    })
-  }
+        todoData: this.togglePropperty(todoData, id, "done"),
+      };
+    });
+  };
   onToggleImportant = (id) => {
     this.setState(({ todoData }) => {
       return {
-        todoData: this.togglePropperty(todoData, id, 'important')
-      }
-    })
-  }
+        todoData: this.togglePropperty(todoData, id, "important"),
+      };
+    });
+  };
   generateId = () => {
-    return Math.random().toString(32).substring(2, 9) + (+new Date()).toString(32);
-  }
+    return (
+      Math.random().toString(32).substring(2, 9) + (+new Date()).toString(32)
+    );
+  };
   createTodoItem = (label) => {
     return {
       label,
       important: false,
       done: false,
       id: this.generateId(),
-    }
-  }
+    };
+  };
   deleteItem = (id) => {
     this.setState(({ todoData }) => {
       return {
@@ -66,36 +69,61 @@ class App extends Component {
     });
   };
   addItem = (value) => {
-    const newItem = this.createTodoItem(value)
+    const newItem = this.createTodoItem(value);
     this.setState(({ todoData }) => {
       return {
-        todoData: [...todoData, newItem]
-      }
-    })
+        todoData: [...todoData, newItem],
+      };
+    });
   };
-
   onSearchChange = (term) => {
-    this.setState({ term })
-  }
-  serchItem (data, term) {
-    if (term == '') {
-      return data
+    this.setState({ term });
+  };
+  serchItem(data, term) {
+    if (term == "") {
+      return data;
     }
-    return data.filter(item => item.label.toLowerCase().indexOf(term)>-1)
+    return data.filter((item) => item.label.toLowerCase().indexOf(term) > -1);
   }
+  statusFilter = (filter) => {
+    this.setState({ filter });
+  };
+  filterItem = (data, str) => {
+    if (str == "all") {
+      return data;
+    } else if (str == "active") {
+      return data.filter((item) => {
+        return !item.done;
+      });
+    } else {
+      return data.filter((item) => {
+        return item.done;
+      });
+    }
+  };
   render() {
-    const { todoData, term } = this.state;
-    const visibleItem = this.serchItem(todoData, term)
-    const doneCount = todoData.filter(item => item.done).length;
+    const { todoData, term, filter } = this.state;
+    //const filterItem = this.filterItem(todoData,filter)
+    //const visibleItems = this.serchItem(filterItem, term)
+    const visibleItems = this.filterItem(
+      this.serchItem(todoData, term),
+      filter
+    );
+    const doneCount = todoData.filter((item) => item.done).length;
     const todoCount = todoData.length - doneCount;
     return (
       <div className="todo-app">
         <AppHeader toDo={todoCount} done={doneCount} />
         <div className="top-panel d-flex">
           <SearchPanel onSearchChange={this.onSearchChange} />
-          <ItemStatusFilter />
+          <ItemStatusFilter filter={filter} statusFilter={this.statusFilter} />
         </div>
-        <TodoList todos={visibleItem} onDeleted={this.deleteItem} onToggleDone={this.onToggleDone} onToggleImportant={this.onToggleImportant} />
+        <TodoList
+          todos={visibleItems}
+          onDeleted={this.deleteItem}
+          onToggleDone={this.onToggleDone}
+          onToggleImportant={this.onToggleImportant}
+        />
         <ItemAddForm addItem={this.addItem} />
       </div>
     );
